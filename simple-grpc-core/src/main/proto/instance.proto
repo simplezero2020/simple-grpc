@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.ypshengxian.ostrich.core.common";
+option java_outer_classname = "OstrichProto";
+
+package com.ypshengxian.ostrich.core.common;
+
+message InstanceInfo {
+    string datacenter = 1;
+    string segment = 2;
+    string app_name = 3;
+    string desc_name = 4;
+    string ip = 5;
+    int32 port = 6;
+    string hostname = 7;
+    map<string, string> metadata = 8;
+}

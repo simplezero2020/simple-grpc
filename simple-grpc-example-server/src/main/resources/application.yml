@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: simple-grpc-example-server
+
+# 服务配置
+simplegrpc:
+    port: 8522
+    address: 127.0.0.1
+    datacenter: aliyun
+    segment: dev
+    etcd:
+      endpoints: ["http://127.0.0.1:2379"]
+
