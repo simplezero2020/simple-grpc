@@ -51,7 +51,6 @@ public class SimpleGrpcServiceProcessor extends AbstractProcessor {
         if (processedClass.contains(serviceFullClassName)) {
             return;
         }
-
         try {
             Optional<? extends AnnotationMirror> annotationMirrorResult = classElement
                     .getAnnotationMirrors()
@@ -74,11 +73,9 @@ public class SimpleGrpcServiceProcessor extends AbstractProcessor {
                     grpcImplBaseClassName = entry.getValue().getValue().toString();
                 }
             }
-
             if (grpcImplBaseClassName == null) {
                 return;
             }
-
             String servicePojoClassSimpleName = classElement.getSimpleName().toString();
             String servicePojoClassName = classElement.getQualifiedName().toString();
             String servicePackageName = ClassUtils.getPackageName(serviceFullClassName);

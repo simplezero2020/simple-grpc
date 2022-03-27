@@ -43,9 +43,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 public class SpringBootServerRunner implements CommandLineRunner,
         ApplicationListener<ContextClosedEvent> {
-
     private static final Logger logger = LoggerFactory.getLogger(SpringBootServerRunner.class);
-
     @Autowired
     private ConfigurableApplicationContext applicationContext;
     @Autowired
@@ -123,35 +121,32 @@ public class SpringBootServerRunner implements CommandLineRunner,
             serviceRegisterTask.cancel(true);
         }
         serviceRegisterTask = scheduledExecutor.schedule(
-                () -> executor.execute(new LogExceptionRunnable(new ServiceRegisterJob())),
+                () -> executor.execute(new LogExceptionRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            scannedServices.forEach(serviceDefinition ->
+                                    registerService(serviceDefinition.getServiceDescriptor()));
+                        } catch (Exception exception) {
+                            startServiceRegister(Constant.SERVICE_RETRY_REGISTRY_INTERVAL);
+                        }
+                    }
+                    private void registerService(@Nonnull final ServiceDescriptor serviceDescriptor) {
+                        final String serviceName = serviceDescriptor.getName();
+                        healthStatusManager.setStatus(serviceName, HealthCheckResponse.ServingStatus.SERVING);
+                        final var serviceInstance = new ServiceInstance(InstanceInfo.newBuilder()
+                                .setAppName(instanceInfo.getAppName())
+                                .setDatacenter(instanceInfo.getDatacenter())
+                                .setSegment(instanceInfo.getSegment())
+                                .setDescName(serviceDescriptor.getName())
+                                .setIp(instanceInfo.getIp())
+                                .setPort(instanceInfo.getPort())
+                                .setHostname(instanceInfo.getHostname())
+                                .build());
+                        storageService.register(serviceInstance);
+                    }
+                })),
                 interval, TimeUnit.SECONDS);
-    }
-
-    private class ServiceRegisterJob implements Runnable {
-        @Override
-        public void run() {
-            try {
-                scannedServices.forEach(serviceDefinition ->
-                        registerService(serviceDefinition.getServiceDescriptor()));
-            } catch (Exception exception) {
-                startServiceRegister(Constant.SERVICE_RETRY_REGISTRY_INTERVAL);
-            }
-        }
-
-        private void registerService(@Nonnull final ServiceDescriptor serviceDescriptor) {
-            final String serviceName = serviceDescriptor.getName();
-            healthStatusManager.setStatus(serviceName, HealthCheckResponse.ServingStatus.SERVING);
-            final var serviceInstance = new ServiceInstance(InstanceInfo.newBuilder()
-                    .setAppName(instanceInfo.getAppName())
-                    .setDatacenter(instanceInfo.getDatacenter())
-                    .setSegment(instanceInfo.getSegment())
-                    .setDescName(serviceDescriptor.getName())
-                    .setIp(instanceInfo.getIp())
-                    .setPort(instanceInfo.getPort())
-                    .setHostname(instanceInfo.getHostname())
-                    .build());
-            storageService.register(serviceInstance);
-        }
     }
 
 

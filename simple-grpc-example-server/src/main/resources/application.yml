@@ -4,7 +4,7 @@ spring:
 
 # 服务配置
 simplegrpc:
-    port: 8522
+    port: 8523
     address: 127.0.0.1
     datacenter: aliyun
     segment: dev

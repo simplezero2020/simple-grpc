@@ -31,6 +31,8 @@ public class SimpleNameResolver extends NameResolver {
     private final String instancesPrefix;
     private final Executor channelExecutor = SharedResourceHolder.get(GrpcUtil.SHARED_CHANNEL_EXECUTOR);
 
+    private KvClient.Watch watcher;
+
     public SimpleNameResolver(@Nonnull String authority, String query,
                               SimpleGrpcStorageService simpleGrpcStorageService,
                               String segment, String datacenter) {
@@ -51,17 +53,6 @@ public class SimpleNameResolver extends NameResolver {
         watch();
     }
 
-
-    @Override
-    public String getServiceAuthority() {
-        return authority;
-    }
-
-    @Override
-    public void shutdown() {
-    }
-
-    private KvClient.Watch watcher;
 
     private void resolve() {
         listener.onAddresses(simpleGrpcStorageService.discovery(instancesPrefix + "/" + authority), Attributes.EMPTY);
@@ -104,4 +95,13 @@ public class SimpleNameResolver extends NameResolver {
         }
     }
 
+
+    @Override
+    public String getServiceAuthority() {
+        return authority;
+    }
+
+    @Override
+    public void shutdown() {
+    }
 }

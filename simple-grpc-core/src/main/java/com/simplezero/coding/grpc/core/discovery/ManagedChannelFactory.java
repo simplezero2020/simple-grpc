@@ -25,15 +25,9 @@ public class ManagedChannelFactory {
     public ManagedChannel create(String serviceName) {
         final ManagedChannelResource channelResource =
                 serviceResources.computeIfAbsent(serviceName,
-                        (serviceName2) -> new ManagedChannelResource(serviceName2, forAppName,
+                        (serviceName2) -> new ManagedChannelResource(serviqceName2, forAppName,
                                 nameResolverProvider));
         return SharedResourceHolder.get(channelResource);
     }
 
-    public void releaseChannel(String serviceName, ManagedChannel channel) {
-        ManagedChannelResource channelResource = serviceResources.get(serviceName);
-        if (channelResource != null) {
-            SharedResourceHolder.release(channelResource, channel);
-        }
-    }
 }
